@@ -44,5 +44,9 @@ COPY webapp-counter-service.py .
 # This application runs on Docker as an appuser, which is restricted to binding to ports below 1024.
 EXPOSE 8080
 
+# Add simple healthcheck
+HEALTHCHECK  --interval=30s --timeout=3s \
+  CMD wget --no-verbose --tries=2 --spider http://localhost:8080/health || exit 1
+
 # Run the application.Logs enabled to see the output logs
 CMD ["gunicorn", "webapp-counter-service:app", "--bind", "0.0.0.0:8080", "--access-logfile", "-", "--error-logfile", "-"]
