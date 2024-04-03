@@ -28,8 +28,8 @@ jobs:
           command: |
             echo $DOCKER_REGISTRY_PASS | docker login -u $DOCKER_REGISTRY_USER --password-stdin
             docker buildx create --use
-            docker buildx build --platform linux/amd64,linux/arm64 -t $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME:$TAG --push .
-            docker buildx build --platform linux/amd64,linux/arm64 -t $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME --push .
+            docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME:$TAG --push .
+            docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME --push .
   deploy:
     docker:
       - image: cimg/base:2024.01
