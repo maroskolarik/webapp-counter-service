@@ -30,7 +30,21 @@ jobs:
             docker buildx create --use
             docker buildx build --platform linux/amd64,linux/arm64 -t $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME:$TAG --push .
             docker buildx build --platform linux/amd64,linux/arm64 -t $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME --push .
-
+  deploy:
+    docker:
+      - image: cimg/base:2024.01
+    resource_class: small
+    steps:
+      - checkout
+      - run:
+          name: Deploy Over SSH
+          command: |
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
+            docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASS &&
+            docker container stop $CIRCLE_PROJECT_REPONAME || true &&
+            docker container rm $CIRCLE_PROJECT_REPONAME || true &&
+            docker pull $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME &&
+            docker run --name $CIRCLE_PROJECT_REPONAME -p 5005:8080 -d $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME"
 
 workflows:
   test_build_deploy:
@@ -39,3 +53,6 @@ workflows:
       - build:
           requires:
             - test
+      - deploy:
+          requires:
+            - build
