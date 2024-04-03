@@ -13,8 +13,24 @@ jobs:
       - run:
           name: Run test
           command: pytest ./src/test-webapp.py
+  build:
+    docker:
+      - image: cimg/base:2024.01
+    resource_class: medium
+    environment:
+      TAG: 0.0.<< pipeline.number >>
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - run:
+          command: echo "building image"
+
 
 workflows:
   test_build_deploy:
     jobs:
       - test
+      - build:
+          requires:
+            - test
