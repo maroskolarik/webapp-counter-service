@@ -36,8 +36,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 # Switch to the non-privileged user to run the application.
 USER appuser
 
-# Copy the source code(webapp-counter-service.py) into the container.
-COPY webapp-counter-service.py .
+# Copy the source code(webapp.py) into the container.
+COPY src/webapp.py .
 
 # Expose the port that the application listens on.
 # In most Unix-like operating systems, binding to ports below 1024 requires elevated privileges.
@@ -49,4 +49,4 @@ HEALTHCHECK  --interval=30s --timeout=3s \
   CMD wget --no-verbose --tries=2 --spider http://localhost:8080/health || exit 1
 
 # Run the application.Logs enabled to see the output logs
-CMD ["gunicorn", "webapp-counter-service:app", "--bind", "0.0.0.0:8080", "--access-logfile", "-", "--error-logfile", "-"]
+CMD ["gunicorn", "webapp:app", "--bind", "0.0.0.0:8080", "--access-logfile", "-", "--error-logfile", "-"]
