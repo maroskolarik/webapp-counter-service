@@ -4,6 +4,9 @@ jobs:
   test:
     docker:
       - image: cimg/python:3.12.2
+        auth:
+          username: $DOCKER_REGISTRY_USER
+          password: $DOCKER_REGISTRY_PASS
     resource_class: small
     steps:
       - checkout
@@ -11,11 +14,14 @@ jobs:
           name: Install requirements
           command: pip install -r requirements.txt
       - run:
-          name: Run test
+          name: Run tests
           command: pytest ./src/test-webapp.py
   build:
     docker:
       - image: cimg/base:2024.02
+        auth:
+          username: $DOCKER_REGISTRY_USER
+          password: $DOCKER_REGISTRY_PASS
     resource_class: medium
     environment:
       TAG: 0.0.<< pipeline.number >>
@@ -33,6 +39,9 @@ jobs:
   deploy:
     docker:
       - image: cimg/base:2024.02
+        auth:
+          username: $DOCKER_REGISTRY_USER
+          password: $DOCKER_REGISTRY_PASS
     resource_class: small
     steps:
       - checkout
