@@ -60,6 +60,7 @@ jobs:
       - run:
           name: Do Terraform magic
           command: |
+            cd ./.terraform
             terraform apply -auto-approve
             echo "WCS_SERVER_PUBLIC_IP=$(terraform output -json wcs-server-public-ip)" >> $BASH_ENV
 
