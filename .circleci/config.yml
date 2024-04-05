@@ -55,8 +55,9 @@ jobs:
       - run:
           name: Initialize Terraform
           command: |
-            cd ./terraform
-            terraform init
+            ls -lha /home/circleci/project
+#            cd ./terraform
+#            terraform init
 
   deploy:
     docker:
