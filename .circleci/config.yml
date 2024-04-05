@@ -63,6 +63,7 @@ jobs:
             cd ./.terraform
             terraform apply -auto-approve
             echo "WCS_SERVER_PUBLIC_IP=$(terraform output -raw wcs-server-public-ip)" >> $BASH_ENV
+            printenv WCS_SERVER_PUBLIC_IP
 
   deploy:
     docker:
