@@ -34,8 +34,8 @@ jobs:
           command: |
             echo $DOCKER_REGISTRY_PASS | docker login -u $DOCKER_REGISTRY_USER --password-stdin
             docker buildx create --use
-            docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME:$TAG --push .
-            docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME --push .
+            docker buildx build --platform linux/amd64,linux/arm64 -t $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME:$TAG --push .
+            docker buildx build --platform linux/amd64,linux/arm64 -t $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME --push .
   prepare-infrastructure:
     docker:
       - image: cimg/base:2024.02
@@ -57,6 +57,11 @@ jobs:
           command: |
             cd ./.terraform
             terraform init
+      - run:
+          name: Do Terraform magic
+          command: |
+            terraform apply -auto-approve
+            echo "WCS_SERVER_PUBLIC_IP=$(terraform output -json wcs-server-public-ip)" >> $BASH_ENV
 
   deploy:
     docker:
@@ -70,7 +75,10 @@ jobs:
       - run:
           name: Deploy Over SSH
           command: |
-            ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST "
+            mkdir -p ~/.ssh
+            echo "$WCS_SERVER_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+            chmod 400 ~/.ssh/id_rsa
+            ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $EC2_USER@$WCS_SERVER_PUBLIC_IP "
             docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASS &&
             docker container stop $CIRCLE_PROJECT_REPONAME || true &&
             docker container rm $CIRCLE_PROJECT_REPONAME || true &&
