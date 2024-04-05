@@ -62,7 +62,7 @@ jobs:
           command: |
             cd ./.terraform
             terraform apply -auto-approve
-            echo "WCS_SERVER_PUBLIC_IP=$(terraform output -json wcs-server-public-ip)" >> $BASH_ENV
+            echo "WCS_SERVER_PUBLIC_IP=$(terraform output -raw wcs-server-public-ip)" >> $BASH_ENV
 
   deploy:
     docker:
@@ -76,16 +76,15 @@ jobs:
       - run:
           name: Deploy Over SSH
           command: |
-            mkdir -p ~/.ssh
-            echo "$WCS_SERVER_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-            chmod 400 ~/.ssh/id_rsa
-            printenv WCS_SERVER_PUBLIC_IP
-#            ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $EC2_USER@$WCS_SERVER_PUBLIC_IP
-#            docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASS &&
-#            docker container stop $CIRCLE_PROJECT_REPONAME || true &&
-#            docker container rm $CIRCLE_PROJECT_REPONAME || true &&
-#            docker pull $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME &&
-#            docker run --name $CIRCLE_PROJECT_REPONAME -v data:/data -p 80:8080 -d $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME"
+#            mkdir -p ~/.ssh
+#            echo "$WCS_SERVER_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+#            chmod 400 ~/.ssh/id_rsa
+            ssh -i $WCS_SERVER_SSH_PRIVATE_KEY -o StrictHostKeyChecking=no $EC2_USER@$WCS_SERVER_PUBLIC_IP "
+            docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASS &&
+            docker container stop $CIRCLE_PROJECT_REPONAME || true &&
+            docker container rm $CIRCLE_PROJECT_REPONAME || true &&
+            docker pull $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME &&
+            docker run --name $CIRCLE_PROJECT_REPONAME -v data:/data -p 80:8080 -d $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME"
 
 workflows:
   test_build_deploy:
