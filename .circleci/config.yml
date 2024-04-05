@@ -48,7 +48,7 @@ jobs:
       - run:
           name: Deploy Over SSH
           command: |
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "
+            ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST "
             docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASS &&
             docker container stop $CIRCLE_PROJECT_REPONAME || true &&
             docker container rm $CIRCLE_PROJECT_REPONAME || true &&
