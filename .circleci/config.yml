@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   test:
     docker:
-      - image: python:3.12-slim-bookworm
+      - image: cimg/python:3.12.2
     resource_class: small
     steps:
       - checkout
@@ -15,7 +15,7 @@ jobs:
           command: pytest ./src/test-webapp.py
   build:
     docker:
-      - image: cimg/base:2024.01
+      - image: cimg/base:2024.02
     resource_class: medium
     environment:
       TAG: 0.0.<< pipeline.number >>
@@ -32,7 +32,7 @@ jobs:
             docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME --push .
   deploy:
     docker:
-      - image: cimg/base:2024.01
+      - image: cimg/base:2024.02
     resource_class: small
     steps:
       - checkout
