@@ -89,4 +89,5 @@ workflows:
             - test
       - deploy:
           requires:
+            - prepare-infrastructure
             - build
