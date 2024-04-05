@@ -53,7 +53,7 @@ jobs:
             docker container stop $CIRCLE_PROJECT_REPONAME || true &&
             docker container rm $CIRCLE_PROJECT_REPONAME || true &&
             docker pull $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME &&
-            docker run --name $CIRCLE_PROJECT_REPONAME -p 80:8080 -d $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME"
+            docker run --name $CIRCLE_PROJECT_REPONAME -v data:/data -p 80:8080 -d $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME"
 
 workflows:
   test_build_deploy:
