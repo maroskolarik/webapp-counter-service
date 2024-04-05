@@ -48,6 +48,7 @@ jobs:
       - run:
           name: Install Terraform
           command: |
+            sudo su
             apt update && apt install terraform -y
       - run:
           name: Initialize Terraform
