@@ -36,35 +36,6 @@ jobs:
             docker buildx create --use
             docker buildx build --platform linux/amd64,linux/arm64 -t $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME:$TAG --push .
             docker buildx build --platform linux/amd64,linux/arm64 -t $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME --push .
-  prepare-infrastructure:
-    docker:
-      - image: cimg/base:2024.02
-        auth:
-          username: $DOCKER_REGISTRY_USER
-          password: $DOCKER_REGISTRY_PASS
-    resource_class: small
-    steps:
-      - checkout
-      - run:
-          name: Install Terraform
-          command: |
-            wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-            echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-            sudo apt update && sudo apt install terraform
-            terraform -version
-      - run:
-          name: Initialize Terraform
-          command: |
-            cd ./.terraform
-            terraform init
-      - run:
-          name: Do Terraform magic
-          command: |
-            cd ./.terraform
-            terraform apply -auto-approve
-            echo "WCS_SERVER_PUBLIC_IP=$(terraform output -raw wcs-server-public-ip)" >> $BASH_ENV
-            printenv WCS_SERVER_PUBLIC_IP
-
   deploy:
     docker:
       - image: cimg/base:2024.02
@@ -91,13 +62,17 @@ workflows:
   test_build_deploy:
     jobs:
       - test
-      - prepare-infrastructure:
-          requires:
-            - test
       - build:
           requires:
             - test
+          filters:
+            branches:
+              only:
+                - main
       - deploy:
           requires:
-            - prepare-infrastructure
             - build
+          filters:
+            branches:
+              only:
+                - main
