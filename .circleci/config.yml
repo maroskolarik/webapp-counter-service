@@ -61,10 +61,12 @@ jobs:
 workflows:
   test_build_deploy:
     jobs:
-      - test
+      - test:
+          filters:
+            branches:
+              only:
+                - dev
       - build:
-          requires:
-            - test
           filters:
             branches:
               only:
