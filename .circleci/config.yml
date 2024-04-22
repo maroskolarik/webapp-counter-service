@@ -1,7 +1,7 @@
 version: 2.1
 
 jobs:
-  test:
+  test_app:
     docker:
       - image: cimg/python:3.12.2
         auth:
@@ -16,7 +16,7 @@ jobs:
       - run:
           name: Run tests
           command: pytest ./src/test-webapp.py
-  build:
+  build_docker_image:
     docker:
       - image: cimg/base:2024.02
         auth:
@@ -36,7 +36,7 @@ jobs:
             docker buildx create --use
             docker buildx build --platform linux/amd64,linux/arm64 -t $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME:$TAG --push .
             docker buildx build --platform linux/amd64,linux/arm64 -t $DOCKER_REGISTRY_USER/$CIRCLE_PROJECT_REPONAME --push .
-  deploy:
+  deploy_docker_container:
     docker:
       - image: cimg/base:2024.02
         auth:
@@ -61,19 +61,19 @@ jobs:
 workflows:
   test_build_deploy:
     jobs:
-      - test:
+      - test_app:
           filters:
             branches:
               only:
                 - dev
-      - build:
+      - build_docker_image:
           filters:
             branches:
               only:
                 - main
-      - deploy:
+      - deploy_docker_container:
           requires:
-            - build
+            - build_docker_image
           filters:
             branches:
               only:
