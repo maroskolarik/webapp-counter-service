@@ -73,7 +73,7 @@ workflows:
                 - main
       - deploy_docker_container:
           requires:
-            - build
+            - build_docker_image
           filters:
             branches:
               only:
