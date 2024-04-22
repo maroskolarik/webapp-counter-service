@@ -11,7 +11,7 @@ It maintains a web page with a counter for the number of POST requests it has se
 Start the application by running:
 `docker compose up --build`.
 
-The application will be available at http://localhost:8080.
+The application will be available at http://localhost:80.
 
 ### Deploying your application to the cloud
 
