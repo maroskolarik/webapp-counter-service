@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  node-exporter:
+    image: prom/node-exporter
+    container_name: node-exporter
+    restart: always
+    networks:
+      - mon
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: always
+    networks:
+      - mon
+    ports:
+      - "9090:9090"
+    volumes:
+      - /home/ubuntu/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: always
+    networks:
+      - mon
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+networks:
+  mon:
+    driver: bridge
+
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
