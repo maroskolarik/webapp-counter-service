@@ -41,7 +41,7 @@ resource "aws_security_group" "wcs-sg" {
   description = "allow inbound traffic on specific ports and all outbound traffic"
   vpc_id      = aws_vpc.wcs-vpc.id
   ingress = [
-    for port in [22, 80] : {
+    for port in [22, 80, 3000] : {
       description      = "TLS from VPC"
       from_port        = port
       to_port          = port
